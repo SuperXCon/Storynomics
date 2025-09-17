@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>STORYNOTICS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+
+    <!-- iOS Safari safe area 배경색을 검은색으로 설정 -->
+    <meta name="theme-color" content="#000000" />
+    <meta name="msapplication-navbutton-color" content="#000000" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <style>
+      @import url("https://fonts.googleapis.com/css?family=Roboto+Mono:var(--label-large-font-weight),var(--label-small-font-weight),var(--label-medium-font-weight),500,700|Anton+SC:400");
+      @import url("https://fonts.googleapis.com/css2?family=Creepster&family=Nosifer&family=Butcherman&family=Inter:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap");
+      @font-face {
+        font-family: "Evil Empire-Regular";
+        src: url("/fonts/evil-empire.otf") format("opentype");
+      }
+      
+      @font-face {
+        font-family: "Evil Empire";
+        src: url("/fonts/evil-empire.otf") format("opentype");
+      }
+
+      @font-face {
+        font-family: "Roobert-Medium";
+        src: url("/fonts/roobert-medium.otf") format("opentype");
+      }
+
+      @font-face {
+        font-family: "Roobert-SemiBold";
+        src: url("/fonts/roobert-semibold.otf") format("opentype");
+      }
+
+      @font-face {
+        font-family: "Roobert";
+        src: url("/fonts/roobert-medium.otf") format("opentype");
+        font-weight: 500;
+      }
+
+      @font-face {
+        font-family: "Roobert";
+        src: url("/fonts/roobert-semibold.otf") format("opentype");
+        font-weight: 600;
+      }
+
+      @font-face {
+        font-family: "Helvetica Neue-Regular";
+        src: url("https://anima-uploads.s3.amazonaws.com/projects/66dbe8113cbd8877008f2c1a/fonts/5796578-1.svg")
+          format("");
+      }
+    </style>
+    <style>
+      @import url("https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css");
+      * {
+        -webkit-font-smoothing: antialiased;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0px;
+        height: 100%;
+        background-color: #000000; /* iOS safe area 배경색 */
+      }
+
+      /* 모바일 브라우저에서 safe area 바깥까지 전체 화면 사용 */
+      body {
+        min-height: 100vh;
+        min-height: 100dvh; /* 동적 viewport 높이 */
+        overflow-x: hidden; /* 좌우 오버플로우 방지 */
+        /* Safe area 무시하고 전체 화면 사용 */
+        margin: 0;
+        padding: 0;
+      }
+
+      #app {
+        /* Safe area 바깥까지 전체 viewport 사용 */
+        min-height: 100vh;
+        min-height: 100dvh;
+        width: 100vw;
+
+        /* Safe area 무시하고 전체 화면 사용 */
+        margin: 0;
+        padding: 0;
+        position: relative;
+
+        /* Safe area 마스킹 - 바깥 영역 오버플로우 hidden */
+        clip-path: polygon(
+          env(safe-area-inset-left, 0px) env(safe-area-inset-top, 0px),
+          calc(100% - env(safe-area-inset-right, 0px)) env(safe-area-inset-top, 0px),
+          calc(100% - env(safe-area-inset-right, 0px)) calc(100% - env(safe-area-inset-bottom, 0px)),
+          env(safe-area-inset-left, 0px) calc(100% - env(safe-area-inset-bottom, 0px))
+        );
+
+        /* 오버플로우 제어 */
+        overflow: hidden; /* 전체 오버플로우 차단 */
+      }
+
+      /* iOS 26 Safari fixed/sticky 호환성 개선 */
+      @supports (position: -webkit-sticky) {
+        /* iOS Safari를 위한 추가 안정성 */
+        html {
+          -webkit-overflow-scrolling: touch;
+        }
+      }
+
+      /* iOS 26 Safari 뷰포트 안정화 */
+      @media screen and (max-device-width: 768px) {
+        html {
+          height: -webkit-fill-available;
+        }
+
+        body {
+          min-height: -webkit-fill-available;
+        }
+
+        #app {
+          min-height: -webkit-fill-available;
+        }
+      }
+
+      /* 스크롤 가능한 콘텐츠 컨테이너 */
+      .scroll-container {
+        height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+        height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+        overflow-y: auto;
+        overflow-x: hidden;
+        margin-top: env(safe-area-inset-top, 0px);
+        margin-left: env(safe-area-inset-left, 0px);
+        margin-right: env(safe-area-inset-right, 0px);
+        margin-bottom: env(safe-area-inset-bottom, 0px);
+        width: calc(100% - env(safe-area-inset-left, 0px) - env(safe-area-inset-right, 0px));
+      }
+      /* a blue color as a generic focus style */
+      button:focus-visible {
+        outline: 2px solid #4a90e2 !important;
+        outline: -webkit-focus-ring-color auto 5px !important;
+      }
+      a {
+        text-decoration: none;
+      }
+    </style>
+    <link href="tailwind.css" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./src/index.tsx"></script>
+  </body>
+</html>

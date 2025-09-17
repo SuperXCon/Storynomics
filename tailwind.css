@@ -1,0 +1,492 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  button,
+  input,
+  select,
+  textarea {
+    @apply appearance-none bg-transparent border-0 outline-none;
+  }
+  
+/* 모바일 디바이스에서만 동적으로 적용될 스타일 */
+body[data-device-type="mobile"] {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  position: relative;
+  /* iOS 탄성 스크롤 방지 */
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+body[data-device-type="mobile"] html {
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
+  /* iOS 탄성 스크롤 방지 */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 모바일에서 HeroSection의 GSAP 스크롤 트리거가 iOS에서 정상 작동하도록 */
+body[data-device-type="mobile"] .hero-section {
+  /* iOS WebKit에서 스크롤 트리거 최적화 */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* 모바일에서 sticky 요소의 iOS 최적화 */
+body[data-device-type="mobile"] .sticky-container {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+body[data-device-type="mobile"] * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* 모바일에서 모든 컨테이너 요소의 최대 너비 제한 */
+body[data-device-type="mobile"] .w-\[var\(--grid-width\)\] {
+  max-width: 100vw !important;
+  overflow-x: hidden;
+}
+
+/* 모바일에서 섹션과 이미지들의 최대 너비 제한 (HeroSection 제외) */
+body[data-device-type="mobile"] section:not(.hero-section),
+body[data-device-type="mobile"] div:not(.sticky-container):not(.hero-text-black):not(.hero-text-mask),
+body[data-device-type="mobile"] img {
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* 모바일에서 절대적으로 위치한 요소들도 뷰포트 안에 유지 (HeroSection 관련 제외) */
+body[data-device-type="mobile"] .absolute:not(.hero-text-black):not(.hero-text-mask),
+body[data-device-type="mobile"] .fixed:not([data-background-ref]) {
+  max-width: 100vw;
+}
+}
+
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .all-\[unset\] {
+    all: unset;
+  }
+  
+  .hero-text-invert {
+    mix-blend-mode: difference;
+    filter: invert(1);
+  }
+  
+  .hero-video-clip {
+    transition: clip-path 0.3s ease-out, transform 0.3s ease-out;
+  }
+}
+
+:root {
+  --color-mode-background-bg-primary: var(--primitives-color-base-white);
+  --color-mode-background-bg-primary-inverese: var(
+    --primitives-color-base-black
+  );
+  --color-mode-border-border-primary: var(--primitives-color-cool-gray-200);
+  --color-mode-border-border-primary-muted: var(
+    --primitives-color-cool-gray-100
+  );
+  --color-mode-border-border-primary-muted-duplicate: var(
+    --primitives-color-cool-gray-100-duplicate
+  );
+  --color-mode-border-border-secondary-muted: var(
+    --primitives-color-cool-gray-200
+  );
+  --color-mode-surface-surface-accent: var(--theme-accent-500);
+  --color-mode-surface-surface-accent-disabled: var(--theme-accent-100);
+  --color-mode-surface-surface-secondary: var(
+    --primitives-color-cool-gray-100-duplicate
+  );
+  --color-mode-surface-surface-secondary-disabled: var(
+    --primitives-color-cool-gray-100-duplicate
+  );
+  --color-mode-text-text-accent: var(--theme-accent-500);
+  --color-mode-text-text-accent-hover: var(--theme-accent-600);
+  --color-mode-text-text-primary: var(--primitives-color-base-black);
+  --color-mode-text-text-primary-inverse: var(--primitives-color-base-white);
+  --color-mode-text-text-secondary: var(--primitives-color-cool-gray-400);
+  --color-mode-text-text-secondary-on-accent: var(--theme-accent-200);
+  --corner-corner-02: var(--primitives-radius-radius-02);
+  --corner-corner-04: var(--primitives-radius-radius-04);
+  --corner-corner-04-duplicate: var(--primitives-radius-radius-04-duplicate);
+  --corner-corner-05: var(--primitives-radius-radius-05);
+  --display-medium-font-family: "Evil Empire-Regular", "Evil Empire", "Creepster", "Butcherman", serif;
+  --display-medium-font-size: 72px;
+  --display-medium-font-style: normal;
+  --display-medium-font-weight: 400;
+  --display-medium-letter-spacing: 0px;
+  --display-medium-line-height: 72px;
+  --grid-block-gap: 32px;
+  --grid-container-gap: 32px;
+  --grid-container-gap-2: 80px;
+  --grid-container-hr-padding: 0px;
+  --grid-container-vr-padding: 0px;
+  --grid-content-gap: 32px;
+  --grid-content-hr-padding: 0px;
+  --grid-content-vr-padding: 0px;
+  --grid-section-hr-padding: 64px;
+  --grid-section-vr-padding: 80px;
+  --grid-width: 100vw;
+  --heading-small-font-family: "Roobert", "Inter", "Work Sans", sans-serif;
+  --heading-small-font-size: 24px;
+  --heading-small-font-style: normal;
+  --heading-small-font-weight: 500;
+  --heading-small-letter-spacing: 0px;
+  --heading-small-line-height: 32px;
+  --heading-x-large-font-family: "Evil Empire-Regular", "Evil Empire", "Creepster", "Butcherman", serif;
+  --heading-x-large-font-size: 36px;
+  --heading-x-large-font-style: normal;
+  --heading-x-large-font-weight: 400;
+  --heading-x-large-letter-spacing: 0px;
+  --heading-x-large-line-height: 44px;
+  --label-large-font-family: "Roboto Mono", Helvetica;
+  --label-large-font-size: 18px;
+  --label-large-font-style: normal;
+  --label-large-font-weight: 700;
+  --label-large-letter-spacing: -0.18px;
+  --label-large-line-height: 28px;
+  --label-medium-font-family: "Roboto Mono", Helvetica;
+  --label-medium-font-size: 16px;
+  --label-medium-font-style: normal;
+  --label-medium-font-weight: 700;
+  --label-medium-letter-spacing: -0.32px;
+  --label-medium-line-height: 24px;
+  --label-small-font-family: "Roboto Mono", Helvetica;
+  --label-small-font-size: 14px;
+  --label-small-font-style: normal;
+  --label-small-font-weight: 700;
+  --label-small-letter-spacing: -0.14px;
+  --label-small-line-height: 20px;
+  --paragraph-large-font-family: "Roobert", "Inter", "Work Sans", sans-serif;
+  --paragraph-large-font-size: 18px;
+  --paragraph-large-font-style: normal;
+  --paragraph-large-font-weight: 500;
+  --paragraph-large-letter-spacing: 0px;
+  --paragraph-large-line-height: 24px;
+  --paragraph-medium-font-family: "Roobert", "Inter", "Work Sans", sans-serif;
+  --paragraph-medium-font-size: 16px;
+  --paragraph-medium-font-style: normal;
+  --paragraph-medium-font-weight: 500;
+  --paragraph-medium-letter-spacing: 0px;
+  --paragraph-medium-line-height: 20px;
+  --paragraph-small-font-family: "Roobert", "Inter", "Work Sans", sans-serif;
+  --paragraph-small-font-size: 14px;
+  --paragraph-small-font-style: normal;
+  --paragraph-small-font-weight: 500;
+  --paragraph-small-letter-spacing: 0px;
+  --paragraph-small-line-height: 20px;
+  --primitives-color-base-black: rgba(10, 10, 10, 1);
+  --primitives-color-base-white: rgba(255, 255, 255, 1);
+  --primitives-color-blue-100: rgba(255, 224, 221, 1);
+  --primitives-color-blue-200: rgba(252, 159, 152, 1);
+  --primitives-color-blue-400: rgba(230, 58, 67, 1);
+  --primitives-color-blue-500: rgba(207, 17, 38, 1);
+  --primitives-color-blue-600: rgba(184, 15, 31, 1);
+  --primitives-color-blue-800: rgba(124, 12, 20, 1);
+  --primitives-color-cool-gray-100: rgba(226, 229, 235, 1);
+  --primitives-color-cool-gray-100-duplicate: rgba(226, 229, 235, 1);
+  --primitives-color-cool-gray-200: rgba(195, 201, 209, 1);
+  --primitives-color-cool-gray-400: rgba(132, 142, 158, 1);
+  --primitives-color-cool-gray-500: rgba(98, 109, 124, 1);
+  --primitives-color-cool-gray-600: rgba(76, 85, 99, 1);
+  --primitives-color-cool-gray-700: rgba(52, 59, 69, 1);
+  --primitives-color-cool-gray-800: rgba(34, 38, 46, 1);
+  --primitives-color-cool-gray-800-duplicate: rgba(34, 38, 46, 1);
+  --primitives-color-green-100: rgba(216, 237, 220, 1);
+  --primitives-color-green-200: rgba(157, 203, 168, 1);
+  --primitives-color-green-400: rgba(61, 156, 92, 1);
+  --primitives-color-green-500: rgba(0, 130, 62, 1);
+  --primitives-color-green-600: rgba(0, 102, 41, 1);
+  --primitives-color-green-800: rgba(0, 45, 17, 1);
+  --primitives-radius-radius-00: 0px;
+  --primitives-radius-radius-00-duplicate: 0px;
+  --primitives-radius-radius-02: 4px;
+  --primitives-radius-radius-04: 12px;
+  --primitives-radius-radius-04-duplicate: 12px;
+  --primitives-radius-radius-05: 16px;
+  --primitives-radius-radius-999px: 999px;
+  --primitives-spacing-spacing-02: 4px;
+  --primitives-spacing-spacing-03: 8px;
+  --primitives-spacing-spacing-04: 12px;
+  --primitives-spacing-spacing-05: 16px;
+  --primitives-spacing-spacing-06: 24px;
+  --primitives-spacing-spacing-07: 32px;
+  --primitives-spacing-spacing-10: 64px;
+  --primitives-spacing-spacing-12: 96px;
+  --primitives-spacing-spacing-15: 144px;
+  --theme-accent-100: var(--primitives-color-blue-100);
+  --theme-accent-200: var(--primitives-color-blue-200);
+  --theme-accent-400: var(--primitives-color-blue-400);
+  --theme-accent-500: var(--primitives-color-blue-500);
+  --theme-accent-600: var(--primitives-color-blue-600);
+  --theme-accent-800: var(--primitives-color-blue-800);
+}
+
+/*
+
+To enable a theme in your HTML, simply add one of the following data attributes to an HTML element, like so:
+
+<body data-grid-mode="desktop">
+    <!-- the rest of your content -->
+</body>
+
+You can apply the theme on any DOM node, not just the `body`
+
+*/
+
+[data-grid-mode="desktop"] {
+  --grid-block-gap: 32px;
+  --grid-container-gap: 32px;
+  --grid-container-gap-2: 80px;
+  --grid-content-gap: 32px;
+  --grid-section-hr-padding: 64px;
+  --grid-section-vr-padding: 80px;
+  --grid-width: 100vw;
+}
+
+[data-grid-mode="tablet"] {
+  --grid-block-gap: 32px;
+  --grid-container-gap: 32px;
+  --grid-container-gap-2: 80px;
+  --grid-content-gap: 32px;
+  --grid-section-hr-padding: 64px;
+  --grid-section-vr-padding: 64px;
+  --grid-width: 100vw;
+}
+
+[data-grid-mode="mobile"] {
+  --grid-block-gap: 24px;
+  --grid-container-gap: 24px;
+  --grid-container-gap-2: 40px;
+  --grid-content-gap: 24px;
+  --grid-section-hr-padding: 14px;
+  --grid-section-vr-padding: 48px;
+  --grid-width: 100vw;
+  --primitives-spacing-spacing-15: 14px;
+  
+  /* 모바일 폰트 크기 최적화 */
+  --display-medium-font-size: 42px;
+  --display-medium-line-height: 52px;
+  --heading-x-large-font-size: 28px;
+  --heading-x-large-line-height: 32px;
+  --heading-small-font-size: 16px;
+  --heading-small-line-height: 28px;
+  --paragraph-large-font-size: 16px;
+  --paragraph-large-line-height: 22px;
+}
+
+[data-color-mode-mode="light"] {
+  --color-mode-background-bg-primary: var(--primitives-color-base-white);
+  --color-mode-background-bg-primary-inverese: var(
+    --primitives-color-base-black
+  );
+  --color-mode-border-border-primary: var(--primitives-color-cool-gray-200);
+  --color-mode-border-border-primary-muted: var(
+    --primitives-color-cool-gray-100
+  );
+  --color-mode-border-border-primary-muted-duplicate: var(
+    --primitives-color-cool-gray-100-duplicate
+  );
+  --color-mode-border-border-secondary-muted: var(
+    --primitives-color-cool-gray-200
+  );
+  --color-mode-surface-surface-accent-disabled: var(--theme-accent-100);
+  --color-mode-surface-surface-secondary: var(
+    --primitives-color-cool-gray-100-duplicate
+  );
+  --color-mode-surface-surface-secondary-disabled: var(
+    --primitives-color-cool-gray-100-duplicate
+  );
+  --color-mode-text-text-accent-hover: var(--theme-accent-600);
+  --color-mode-text-text-primary: var(--primitives-color-base-black);
+  --color-mode-text-text-primary-inverse: var(--primitives-color-base-white);
+  --color-mode-text-text-secondary: var(--primitives-color-cool-gray-400);
+}
+
+[data-color-mode-mode="dark"] {
+  --color-mode-background-bg-primary: var(--primitives-color-base-black);
+  --color-mode-background-bg-primary-inverese: var(
+    --primitives-color-base-white
+  );
+  --color-mode-border-border-primary: var(--primitives-color-cool-gray-700);
+  --color-mode-border-border-primary-muted: var(
+    --primitives-color-cool-gray-800
+  );
+  --color-mode-border-border-primary-muted-duplicate: var(
+    --primitives-color-cool-gray-800-duplicate
+  );
+  --color-mode-border-border-secondary-muted: var(
+    --primitives-color-cool-gray-700
+  );
+  --color-mode-surface-surface-accent-disabled: var(--theme-accent-800);
+  --color-mode-surface-surface-secondary: var(
+    --primitives-color-cool-gray-800-duplicate
+  );
+  --color-mode-surface-surface-secondary-disabled: var(
+    --primitives-color-cool-gray-800-duplicate
+  );
+  --color-mode-text-text-accent-hover: var(--theme-accent-400);
+  --color-mode-text-text-primary: var(--primitives-color-base-white);
+  --color-mode-text-text-primary-inverse: var(--primitives-color-base-black);
+  --color-mode-text-text-secondary: var(--primitives-color-cool-gray-200);
+}
+
+[data-corner-mode="rounded"] {
+  --corner-corner-02: var(--primitives-radius-radius-02);
+  --corner-corner-04: var(--primitives-radius-radius-04);
+  --corner-corner-04-duplicate: var(--primitives-radius-radius-04-duplicate);
+  --corner-corner-05: var(--primitives-radius-radius-05);
+}
+
+[data-corner-mode="sharp"] {
+  --corner-corner-02: var(--primitives-radius-radius-00-duplicate);
+  --corner-corner-04: var(--primitives-radius-radius-00);
+  --corner-corner-04-duplicate: var(--primitives-radius-radius-00-duplicate);
+  --corner-corner-05: var(--primitives-radius-radius-00-duplicate);
+}
+
+[data-theme-mode="blue"] {
+  --theme-accent-100: var(--primitives-color-blue-100);
+  --theme-accent-200: var(--primitives-color-blue-200);
+  --theme-accent-400: var(--primitives-color-blue-400);
+  --theme-accent-500: var(--primitives-color-blue-500);
+  --theme-accent-600: var(--primitives-color-blue-600);
+  --theme-accent-800: var(--primitives-color-blue-800);
+}
+
+[data-theme-mode="gray"] {
+  --theme-accent-100: var(--primitives-color-cool-gray-100-duplicate);
+  --theme-accent-200: var(--primitives-color-cool-gray-200);
+  --theme-accent-400: var(--primitives-color-cool-gray-400);
+  --theme-accent-500: var(--primitives-color-cool-gray-500);
+  --theme-accent-600: var(--primitives-color-cool-gray-600);
+  --theme-accent-800: var(--primitives-color-cool-gray-800-duplicate);
+}
+
+[data-theme-mode="green"] {
+  --theme-accent-100: var(--primitives-color-green-100);
+  --theme-accent-200: var(--primitives-color-green-200);
+  --theme-accent-400: var(--primitives-color-green-400);
+  --theme-accent-500: var(--primitives-color-green-500);
+  --theme-accent-600: var(--primitives-color-green-600);
+  --theme-accent-800: var(--primitives-color-green-800);
+}
+
+:root {
+  --animate-spin: spin 1s linear infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 1s var(--animation-delay, 0s) ease forwards;
+}
+
+.animate-fade-up {
+  animation: fade-up 1s var(--animation-delay, 0s) ease forwards;
+}
+
+.animate-marquee {
+  animation: marquee var(--duration) infinite linear;
+}
+
+.animate-marquee-vertical {
+  animation: marquee-vertical var(--duration) linear infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 8s infinite;
+}
+
+.animate-spin {
+  animation: var(--animate-spin);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes image-glow {
+  0% {
+    opacity: 0;
+    animation-timing-function: cubic-bezier(0.74, 0.25, 0.76, 1);
+  }
+
+  10% {
+    opacity: 0.7;
+    animation-timing-function: cubic-bezier(0.12, 0.01, 0.08, 0.99);
+  }
+
+  to {
+    opacity: 0.4;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  90%,
+  to {
+    background-position: calc(-100% - var(--shimmer-width)) 0;
+  }
+
+  30%,
+  60% {
+    background-position: calc(100% + var(--shimmer-width)) 0;
+  }
+}
+
+@keyframes marquee {
+  0% {
+    transform: translate(0);
+  }
+
+  to {
+    transform: translateX(calc(-100% - var(--gap)));
+  }
+}
+
+@keyframes marquee-vertical {
+  0% {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(calc(-100% - var(--gap)));
+  }
+}

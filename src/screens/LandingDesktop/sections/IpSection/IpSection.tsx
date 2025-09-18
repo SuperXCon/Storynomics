@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ScrollToPlugin } from "gsap/ScrollToPlugin";
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 export const IpSection = (): JSX.Element => {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -11,6 +12,7 @@ export const IpSection = (): JSX.Element => {
   const sectionRef = useRef<HTMLElement>(null);
   const navigationRef = useRef<HTMLDivElement>(null);
   const currentTimelineRef = useRef<gsap.core.Timeline | null>(null);
+  const isScrollingRef = useRef(false);
 
   const ipItems = [
     {
@@ -45,12 +47,82 @@ export const IpSection = (): JSX.Element => {
     },
   ];
 
+  // 항목 클릭 시 해당 위치로 스크롤 (데스크탑 & 모바일)
+  const handleItemClick = (targetIndex: number) => {
+    // 이미 active된 항목 클릭 시 무시
+    if (targetIndex === activeIndex) return;
+
+    const navigationItems = navigationRef.current?.querySelectorAll('[data-ip-item]');
+    if (!navigationItems || !navigationItems[targetIndex]) return;
+
+    // 스크롤 중임을 표시
+    isScrollingRef.current = true;
+
+    // 클릭된 항목의 위치 계산
+    const targetElement = navigationItems[targetIndex] as HTMLElement;
+    const targetRect = targetElement.getBoundingClientRect();
+    const targetCenter = targetRect.top + window.scrollY + targetRect.height / 2;
+
+    // 화면 중앙으로 스크롤할 위치 계산
+    const viewportCenter = window.innerHeight / 2;
+    const scrollToPosition = targetCenter - viewportCenter;
+
+    const isMobile = window.innerWidth < 1280;
+
+    console.log(isMobile ? '📱' : '🖱️', 'Item clicked:', {
+      targetIndex,
+      targetItem: ipItems[targetIndex].name,
+      scrollToPosition,
+      isMobile
+    });
+
+    // GSAP을 사용한 부드러운 스크롤 애니메이션
+    gsap.to(window, {
+      scrollTo: scrollToPosition,
+      duration: isMobile ? 0.4 : 0.6, // 모바일에서는 더 빠르게
+      ease: "power2.inOut",
+      onComplete: () => {
+        // 스크롤 완료 후 상태 업데이트
+        setTimeout(() => {
+          isScrollingRef.current = false;
+        }, 100);
+      }
+    });
+
+    // 즉시 active 상태 변경
+    setPrevActiveIndex(activeIndex);
+    setActiveIndex(targetIndex);
+
+    // 캐릭터 이미지를 즉시 active 항목 중앙으로 이동
+    if (imageContainerRef.current && navigationItems[targetIndex]) {
+      const activeItemRect = navigationItems[targetIndex].getBoundingClientRect();
+      const absoluteActiveCenter = activeItemRect.top + window.scrollY + activeItemRect.height / 2;
+      const sectionRect = sectionRef.current?.getBoundingClientRect();
+      const sectionTop = sectionRect ? sectionRect.top + window.scrollY : 0;
+      const targetTop = absoluteActiveCenter - sectionTop;
+
+      console.log('🎯 Image repositioning on click:', {
+        targetIndex,
+        targetTop: targetTop
+      });
+
+      // 이미지 컨테이너를 부드럽게 이동
+      gsap.to(imageContainerRef.current, {
+        top: `${targetTop}px`,
+        duration: isMobile ? 0.4 : 0.6, // 모바일에서는 더 빠르게
+        ease: "power2.inOut"
+      });
+    }
+  };
 
   // 스크롤 기반 활성 아이템 감지 및 이미지 위치 조정
   useEffect(() => {
     if (!sectionRef.current || !navigationRef.current || !imageContainerRef.current) return;
 
     const handleScroll = () => {
+      // 프로그래매틱 스크롤 중일 때는 스크롤 감지 무시
+      if (isScrollingRef.current) return;
+
       const navigationItems = navigationRef.current?.querySelectorAll('[data-ip-item]');
       if (!navigationItems) return;
 
@@ -63,7 +135,7 @@ export const IpSection = (): JSX.Element => {
         const rect = item.getBoundingClientRect();
         const itemCenter = rect.top + window.scrollY + rect.height / 2;
         const distance = Math.abs(viewportCenter - itemCenter);
-        
+
         if (distance < minDistance) {
           minDistance = distance;
           closestIndex = index;
@@ -204,13 +276,12 @@ export const IpSection = (): JSX.Element => {
       data-color-mode-mode="dark"
       aria-labelledby="ip-section-title"
     >
-      {/* Floating Image Layer - iOS 26 Safari 호환성을 위해 absolute + transform 사용 */}
+      {/* Floating Image Layer - iOS 26 Safari 호환성을 위해 absolute 사용 */}
       <div
         ref={imageContainerRef}
         className="absolute mt-[200px] left-[-80px] xl:mt-[280px] xl:left-0 z-10 flex items-center xl:justify-end justify-center xl:w-3/5 w-full pointer-events-none xl:pr-16 pr-0"
         style={{
           top: '50%', // 초기 위치는 섹션 중앙
-          transform: 'translateY(-50%)', // 중앙 정렬
           position: 'absolute'
         }}
       >
@@ -262,7 +333,7 @@ export const IpSection = (): JSX.Element => {
                 key={item.name}
                 data-ip-item
                 className="relative flex xl:items-center items-end xl:justify-start justify-end xl:gap-4 gap-2 cursor-pointer transition-all duration-300 hover:opacity-80 xl:flex-row flex-col"
-                onClick={() => setActiveIndex(index)}
+                onClick={() => handleItemClick(index)}
               >
                 <div
                   className={`xl:text-xs text-[10px] font-medium tracking-[0.18px] [font-family:'Roboto_Mono',Helvetica] transition-all duration-300 xl:order-1 order-2 ${

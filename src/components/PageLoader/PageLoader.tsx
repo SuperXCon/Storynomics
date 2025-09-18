@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useState, useRef } from 'react';
 import { gsap } from 'gsap';
 
 interface PageLoaderProps {
@@ -6,19 +6,70 @@ interface PageLoaderProps {
 }
 
 export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => {
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(100); // HTML에서 이미 100% 완료된 상태로 시작
   const [isVisible, setIsVisible] = useState(true);
   const loaderRef = useRef<HTMLDivElement>(null);
   const whiteLogoRef = useRef<HTMLImageElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // 컴포넌트가 마운트되자마자 즉시 초기화 (HTML에서 100% 완료된 상태로)
+  const initializeWhiteLogo = () => {
+    if (whiteLogoRef.current) {
+      // HTML에서 이미 애니메이션이 완료되었으므로 100% 보이는 상태로 설정
+      whiteLogoRef.current.style.clipPath = 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)';
+      whiteLogoRef.current.style.opacity = '1';
+      // GSAP도 동시에 적용
+      gsap.set(whiteLogoRef.current, {
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)', // 완전히 보이는 상태
+        opacity: 1
+      });
+    } else {
+      // ref가 아직 없으면 다음 프레임에서 다시 시도
+      requestAnimationFrame(initializeWhiteLogo);
+    }
+  };
+
+  // DOM이 실제로 업데이트되기 전에 초기화 (useLayoutEffect)
+  useLayoutEffect(() => {
+    // HTML 로더의 애니메이션 완료를 기다린 후 전환
+    const waitForHtmlAnimation = () => {
+      if ((window as any).htmlLoaderReady) {
+        // HTML 로더를 부드럽게 제거
+        const initialLoader = document.getElementById('initial-loader');
+        if (initialLoader) {
+          initialLoader.style.transition = 'opacity 0.3s ease-out';
+          initialLoader.style.opacity = '0';
+          setTimeout(() => {
+            initialLoader.style.display = 'none';
+          }, 300);
+        }
+
+        initializeWhiteLogo();
+
+        // HTML에서 애니메이션이 완료되었으므로 React에서는 바로 완료 처리로 넘어감
+        setTimeout(() => {
+          // 바로 로딩 완료 로직으로 넘어감 (비디오 재생 대기)
+          setProgress(100);
+        }, 500); // HTML 로더 제거 후 0.5초 대기
+
+      } else {
+        // HTML 애니메이션이 아직 완료되지 않았으면 잠시 후 다시 체크
+        setTimeout(waitForHtmlAnimation, 100);
+      }
+    };
+
+    waitForHtmlAnimation();
+  }, []);
 
   useEffect(() => {
     // 로딩 중 body 스크롤 방지
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
 
+    // 추가 초기화 보장
+    initializeWhiteLogo();
+
     const startTime = Date.now();
-    const minLoadingTime = 1000; // 최소 2초
     const animationDuration = 1000; // 애니메이션은 항상 2초
     const maxWaitTime = 5000; // 최대 5초 후 강제 진행
 
@@ -34,17 +85,14 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
 
     // 비디오 재생 시작 감지
     const handleVideoPlaying = () => {
-      console.log('🎬 PageLoader 비디오 재생 시작!');
       isVideoPlaying = true;
     };
 
     // 비디오 준비 상태 감지
     const handleVideoCanPlay = () => {
-      console.log('📱 PageLoader 비디오 재생 가능');
       // 비디오가 재생 가능하면 실제 재생 시도
       if (video) {
-        video.play().catch(err => {
-          console.log('📱 PageLoader 비디오 재생 실패:', err);
+        video.play().catch(() => {
           // 재생 실패 시에도 진행 (모바일 제한으로 인한 것일 수 있음)
           setTimeout(() => { isVideoPlaying = true; }, 500);
         });
@@ -67,14 +115,13 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
         video.load(); // 명시적으로 로드 시작
       } else {
         // 데스크탑에서는 바로 재생 시도
-        video.play().catch(err => {
-          console.log('🖥️ 데스크탑 초기 재생 실패:', err);
+        video.play().catch(() => {
+          // 데스크탑 초기 재생 실패 처리
         });
       }
 
       // 에러 처리
       video.addEventListener('error', () => {
-        console.log('❌ 비디오 로딩 에러 - 진행');
         isVideoPlaying = true;
       });
     }
@@ -84,7 +131,6 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
 
     // 강제 진행 타이머 (fallback)
     const fallbackTimer = setTimeout(() => {
-      console.log('⚠️ Fallback: 강제 로딩 완료 (5초 초과)');
       if (loaderRef.current) {
         gsap.to(loaderRef.current, {
           opacity: 0,
@@ -112,14 +158,10 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
 
         // 완료 조건 체크 - 더 엄격한 조건
         const waitForComplete = () => {
-          console.log('🔍 체크:', { isPageLoaded, isVideoPlaying });
-
           // 페이지 로딩과 비디오 재생이 모두 완료되었고,
           // 추가로 0.5초 더 기다려서 실제 비디오가 안정적으로 재생되는지 확인
           if (isPageLoaded && isVideoPlaying) {
-            console.log('⏱️ 비디오 안정성 확인 중...');
             setTimeout(() => {
-              console.log('✅ 모든 조건 완료 - 로딩 화면 제거');
               clearTimeout(fallbackTimer);
               if (loaderRef.current) {
                 gsap.to(loaderRef.current, {
@@ -158,11 +200,10 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
   }, [onLoadingComplete]);
 
   useEffect(() => {
-    // 로딩 애니메이션 (아래에서 위로 클리핑)
-    if (whiteLogoRef.current && progress > 0) {
-      const clipPercentage = 100 - progress;
+    // React에서는 이미 100% 완료된 상태를 유지
+    if (whiteLogoRef.current && progress === 100) {
       gsap.set(whiteLogoRef.current, {
-        clipPath: `polygon(0% ${clipPercentage}%, 100% ${clipPercentage}%, 100% 100%, 0% 100%)`
+        clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' // 완전히 보이는 상태
       });
     }
   }, [progress]);
@@ -172,17 +213,20 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
   return (
     <div
       ref={loaderRef}
-      className="page-loader absolute inset-0 z-[9999] bg-black flex items-center justify-center"
+      className="page-loader fixed inset-0 z-[99999] bg-black flex items-center justify-center"
       style={{
         width: '100vw',
-        height: '120vh', // 더 큰 높이로 설정
-        minHeight: '120vh',
-        top: '-10vh', // 위로 확장
+        height: '100vh',
+        minHeight: '100vh',
+        top: 0,
         left: 0,
         right: 0,
-        bottom: '-10vh', // 아래로 확장
+        bottom: 0,
         overflow: 'hidden',
-        position: 'absolute',
+        position: 'fixed',
+        backgroundColor: '#000000',
+        opacity: 0, // React 로더를 숨김 - HTML 로더만 표시
+        pointerEvents: 'none', // 클릭 이벤트 차단
         // Safe area 완전 덮기
         paddingBottom: 'env(safe-area-inset-bottom, 0px)',
         paddingTop: 'env(safe-area-inset-top, 0px)',
@@ -207,7 +251,14 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
           className="absolute top-0 left-0 w-[200px] h-auto sm:w-[250px] md:w-[300px] lg:w-[350px]"
           style={{
             filter: 'brightness(1.2) contrast(1.1)', // 밝은 흰색
-            clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)' // 초기에는 안 보임
+            clipPath: 'polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)', // 초기에는 완전히 숨김
+            opacity: 1, // 이미지 자체는 보이게 함
+            willChange: 'clip-path', // 성능 최적화
+            transition: 'none' // 초기화 시 전환 효과 없음
+          }}
+          onLoad={() => {
+            // 이미지가 로드되자마자 즉시 초기화
+            initializeWhiteLogo();
           }}
         />
       </div>
@@ -230,11 +281,11 @@ export const PageLoader: React.FC<PageLoaderProps> = ({ onLoadingComplete }) => 
       </video>
 
       {/* 진행률 표시 (개발용) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white text-sm font-mono">
-          Loading: {Math.round(progress)}%
-        </div>
-      )}
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 text-white text-sm font-mono bg-black bg-opacity-50 p-2 rounded">
+        <div>Loading: {Math.round(progress)}%</div>
+        <div>ClipPath: {Math.round(100 - progress)}%</div>
+        <div>State: {progress === 0 ? 'Hidden' : progress >= 100 ? 'Visible' : 'Loading'}</div>
+      </div>
     </div>
   );
 };

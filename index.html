@@ -144,7 +144,126 @@
     <link href="tailwind.css" rel="stylesheet" />
   </head>
   <body>
+    <!-- React 로드 전에 즉시 보이는 로더 -->
+    <div id="initial-loader" style="
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: #000000;
+      z-index: 999999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    ">
+      <div style="position: relative;">
+        <!-- 어두운 회색 베이스 로고 -->
+        <img
+          src="/img/loading.png"
+          alt="Loading..."
+          style="width: 250px; height: auto; filter: brightness(0.4) contrast(1.2);"
+        />
+        <!-- 흰색 로고 (초기에 숨김) -->
+        <img
+          id="initial-white-logo"
+          src="/img/loading.png"
+          alt=""
+          style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 250px;
+            height: auto;
+            filter: brightness(1.2) contrast(1.1);
+            clip-path: polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%);
+            opacity: 1;
+          "
+        />
+      </div>
+
+    </div>
+
     <div id="app"></div>
+
+    <script>
+      // HTML 로더에서 애니메이션과 로딩 처리
+      window.addEventListener('DOMContentLoaded', function() {
+        const whiteLogo = document.getElementById('initial-white-logo');
+
+        if (whiteLogo) {
+          let progress = 0;
+          let isVideoPlaying = false;
+          let isPageLoaded = false;
+          const startTime = Date.now();
+          const animationDuration = 1000; // 1초 애니메이션
+
+          // 비디오 로딩 감지 (Hero 비디오)
+          const detectVideoLoading = () => {
+            setTimeout(() => {
+              isVideoPlaying = true; // 임시로 1.5초 후 비디오 준비 완료로 처리
+            }, 1500);
+          };
+
+          // 페이지 로딩 감지
+          const checkPageLoaded = () => {
+            if (document.readyState === 'complete') {
+              isPageLoaded = true;
+            } else {
+              setTimeout(checkPageLoaded, 100);
+            }
+          };
+
+          const animate = () => {
+            const elapsed = Date.now() - startTime;
+            progress = Math.min((elapsed / animationDuration) * 100, 100);
+
+            const clipPercentage = 100 - progress;
+            whiteLogo.style.clipPath = `polygon(0% ${clipPercentage}%, 100% ${clipPercentage}%, 100% 100%, 0% 100%)`;
+
+            if (progress < 100) {
+              requestAnimationFrame(animate);
+            } else {
+              // 애니메이션 완료 후 비디오와 페이지 로딩 완료 대기
+              const waitForComplete = () => {
+                if (isVideoPlaying && isPageLoaded) {
+                  // React 앱의 onLoadingComplete 호출
+                  if (window.handleHtmlLoadingComplete) {
+                    window.handleHtmlLoadingComplete();
+                  }
+
+                  // HTML 로더 페이드 아웃
+                  const initialLoader = document.getElementById('initial-loader');
+                  if (initialLoader) {
+                    initialLoader.style.transition = 'opacity 0.6s ease-out';
+                    initialLoader.style.opacity = '0';
+                    setTimeout(() => {
+                      initialLoader.remove();
+                    }, 600);
+                  }
+                } else {
+                  setTimeout(waitForComplete, 100);
+                }
+              };
+
+              waitForComplete();
+            }
+          };
+
+          // 초기화
+          detectVideoLoading();
+          checkPageLoaded();
+
+          // 500ms 후 애니메이션 시작
+          setTimeout(() => {
+            animate();
+          }, 500);
+        }
+      });
+    </script>
+
     <script type="module" src="./src/index.tsx"></script>
   </body>
 </html>

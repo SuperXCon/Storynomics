@@ -20,7 +20,7 @@ interface LandingDesktopProps {
 }
 
 export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopProps): JSX.Element => {
-  console.log('🏠 LandingDesktop component rendered');
+  //console.log('🏠 LandingDesktop component rendered');
   const backgroundRef = useRef<HTMLDivElement>(null);
   const [gridMode, setGridMode] = useState<'desktop' | 'mobile'>('desktop');
   const [isInitialized, setIsInitialized] = useState(false);
@@ -28,12 +28,12 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
   // 컴포넌트 렌더링 시 스크롤을 맨 위로 강제 이동
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    console.log('📍 LandingDesktop: 스크롤을 맨 위로 설정');
+    //console.log('📍 LandingDesktop: 스크롤을 맨 위로 설정');
 
     // 잠시 후 초기화 완료로 표시 (GSAP 애니메이션 활성화)
     setTimeout(() => {
       setIsInitialized(true);
-      console.log('✅ LandingDesktop 초기화 완료');
+      //console.log('✅ LandingDesktop 초기화 완료');
     }, 100);
   }, []);
 
@@ -48,12 +48,12 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
   const throttledColorUpdate = useCallback(
     throttle((progress: number) => {
       const colorValue = Math.round(255 * (1 - progress));
-      console.log('🎨 Background color update:', { progress, colorValue });
+      //console.log('🎨 Background color update:', { progress, colorValue });
       
       if (backgroundRef.current) {
         try {
           backgroundRef.current.style.backgroundColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`;
-          console.log('✅ Background color applied successfully');
+          //console.log('✅ Background color applied successfully');
         } catch (error) {
           console.error('❌ Error applying background color:', error);
         }
@@ -105,7 +105,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
   const updateBackgroundForSection = useCallback((sectionId: string) => {
     if (!backgroundRef.current) return;
 
-    console.log('🎨 Updating background for section:', sectionId);
+    //console.log('🎨 Updating background for section:', sectionId);
 
     switch (sectionId) {
       case 'about':
@@ -151,7 +151,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
   }, [updateBackgroundForSection]);
 
   useEffect(() => {
-    console.log('🚀 Background animation useEffect started');
+    //console.log('🚀 Background animation useEffect started');
     const backgroundElement = backgroundRef.current;
     if (!backgroundElement) {
       console.error('❌ backgroundElement is null');
@@ -162,7 +162,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
     const setInitialWhiteBackground = () => {
       backgroundElement.style.backgroundColor = 'rgb(255, 255, 255)';
       backgroundElement.style.background = 'rgb(255, 255, 255)';
-      console.log('🎨 Initial background set to white');
+      //console.log('🎨 Initial background set to white');
     };
 
     setInitialWhiteBackground();
@@ -173,10 +173,10 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
 
     // 접근성: 사용자가 애니메이션을 비활성화했는지 확인
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    console.log('🎭 Prefers reduced motion:', prefersReducedMotion);
+    //console.log('🎭 Prefers reduced motion:', prefersReducedMotion);
 
     if (prefersReducedMotion) {
-      console.log('⏸️ Using reduced motion triggers');
+      //console.log('⏸️ Using reduced motion triggers');
       
       // 스크롤 이벤트 감지 테스트 (reduced motion에서도)
       let scrollCount = 0;
@@ -184,7 +184,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
         scrollCount++;
         if (scrollCount % 20 === 0) { // reduced motion에서는 더 자주 로그
           const message = `📜 ReducedMotion Scroll: ${scrollCount}, scrollY: ${window.scrollY}`;
-          console.log(message);
+          //console.log(message);
           if ((window as any).debugLog) {
             (window as any).debugLog(message, 'log');
           }
@@ -200,14 +200,14 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
         scrub: 0.5,       // reduced motion이지만 약간의 부드러움 유지
         onUpdate: (self) => {
           const progress = self.progress;
-          console.log('🔄 ReducedMotion MainContent progress:', progress);
+          //console.log('🔄 ReducedMotion MainContent progress:', progress);
           throttledColorUpdate(progress); // 동일한 함수 사용
         },
         onEnter: () => {
-          console.log('🚪 ReducedMotion MainContent entered');
+          //console.log('🚪 ReducedMotion MainContent entered');
         },
         onLeaveBack: () => {
-          console.log('🚪 ReducedMotion MainContent left back');
+          //console.log('🚪 ReducedMotion MainContent left back');
         },
         invalidateOnRefresh: true
       });
@@ -222,7 +222,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
           scrub: 0.5,
           onUpdate: (self) => {
             const progress = self.progress;
-            console.log('🔄 ReducedMotion Features progress:', progress);
+            //console.log('🔄 ReducedMotion Features progress:', progress);
             // 검은색(0)에서 흰색(255)으로 전환
             const colorValue = Math.round(255 * progress);
             if (backgroundRef.current) {
@@ -243,7 +243,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
           scrub: 0.5,
           onUpdate: (self) => {
             const progress = self.progress;
-            console.log('🔄 ReducedMotion IP progress:', progress);
+            //console.log('🔄 ReducedMotion IP progress:', progress);
             // 흰색(255)에서 검은색(0)으로 전환
             const colorValue = Math.round(255 * (1 - progress));
             if (backgroundRef.current) {
@@ -264,7 +264,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
           scrub: 0.5,
           onUpdate: (self) => {
             const progress = self.progress;
-            console.log('🔄 ReducedMotion CTA progress:', progress);
+            //console.log('🔄 ReducedMotion CTA progress:', progress);
             // 검은색(0)에서 흰색(255)으로 전환
             const colorValue = Math.round(255 * progress);
             if (backgroundRef.current) {
@@ -282,11 +282,11 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
       };
     }
 
-    console.log('🎬 Creating normal animation triggers');
+    //console.log('🎬 Creating normal animation triggers');
 
     // 모든 ScrollTrigger들을 지연 생성하여 초기 배경색이 확실히 설정된 후 실행
     setTimeout(() => {
-      console.log('⏰ Creating delayed ScrollTriggers');
+      //console.log('⏰ Creating delayed ScrollTriggers');
     
     // 스크롤 이벤트 감지 테스트
     let scrollCount = 0;
@@ -294,7 +294,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
       scrollCount++;
       if (scrollCount % 10 === 0) { // 10번째마다 로그 (너무 많은 로그 방지)
         const message = `📜 Scroll detected: ${scrollCount}, scrollY: ${window.scrollY}`;
-        console.log(message);
+        //console.log(message);
         // 특정 기기에서 console 오버라이드가 작동하지 않을 경우 대비
         if ((window as any).debugLog) {
           (window as any).debugLog(message, 'log');
@@ -304,14 +304,14 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
     window.addEventListener('scroll', handleScroll, { passive: true });
     
     // MainContentSection에서 검은색으로 전환
-    console.log('📱 Creating MainContentSection trigger');
+    //console.log('📱 Creating MainContentSection trigger');
     const mainContentElement = document.querySelector("[data-section='main-content']");
-    console.log('🎯 MainContent element found:', !!mainContentElement);
-    console.log('🎯 MainContent element details:', {
-      offsetTop: (mainContentElement as HTMLElement)?.offsetTop,
-      offsetHeight: (mainContentElement as HTMLElement)?.offsetHeight,
-      className: mainContentElement?.className
-    });
+    // console.log('🎯 MainContent element found:', !!mainContentElement);
+    // console.log('🎯 MainContent element details:', {
+    //   offsetTop: (mainContentElement as HTMLElement)?.offsetTop,
+    //   offsetHeight: (mainContentElement as HTMLElement)?.offsetHeight,
+    //   className: mainContentElement?.className
+    // });
     
     if (!mainContentElement) {
       console.error('❌ MainContent section not found!');
@@ -335,7 +335,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
           }
         },
         onEnter: () => {
-          console.log('🚪 MainContent entered');
+          //console.log('🚪 MainContent entered');
           // 실제 스크롤이 발생했을 때만 검은색으로 설정
           const hasScrolled = window.scrollY > 100;
           if (hasScrolled && (!window.location.hash || window.location.hash === '#service')) {
@@ -344,10 +344,10 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
             }
           }
         },
-        onLeave: () => console.log('🚪 MainContent left'),
-        onEnterBack: () => console.log('🚪 MainContent entered back'),
+        // onLeave: () => console.log('🚪 MainContent left'),
+        // onEnterBack: () => console.log('🚪 MainContent entered back'),
         onLeaveBack: () => {
-          console.log('🚪 MainContent left back');
+          // console.log('🚪 MainContent left back');
           // MainContent를 위로 벗어날 때 흰색으로 복원
           if (backgroundRef.current) {
             backgroundRef.current.style.backgroundColor = 'rgb(255, 255, 255)';
@@ -365,7 +365,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
 
     // FeaturesSection에서 흰색으로 전환 후 흰색 유지
     const featuresElement = document.querySelector("[aria-labelledby='features-heading']");
-    console.log('🎯 Features element found:', !!featuresElement);
+    //console.log('🎯 Features element found:', !!featuresElement);
 
     if (!featuresElement) {
       console.error('❌ Features section not found!');
@@ -390,14 +390,14 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
         }
       },
       onEnter: () => {
-        console.log('FeaturesSection entered viewport');
+        //console.log('FeaturesSection entered viewport');
         // Features 섹션에 진입했을 때 즉시 흰색으로 설정
         if (backgroundRef.current) {
           backgroundRef.current.style.backgroundColor = 'rgb(255, 255, 255)';
         }
       },
       onLeave: () => {
-        console.log('FeaturesSection left viewport - maintaining white background');
+        //console.log('FeaturesSection left viewport - maintaining white background');
         // FeaturesSection을 벗어나면 흰색으로 고정
         if (backgroundRef.current) {
           backgroundRef.current.style.backgroundColor = 'rgb(255, 255, 255)';
@@ -408,7 +408,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
 
     // IpSection에서 검은색으로 전환 (섹션이 완전히 보일 때 가장 검은색)
     const ipElement = document.querySelector("[aria-labelledby='ip-section-title']");
-    console.log('🎯 IP element found:', !!ipElement);
+    //console.log('🎯 IP element found:', !!ipElement);
     
     if (!ipElement) {
       console.error('❌ IP section not found!');
@@ -430,10 +430,10 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
         }
       },
       onEnter: () => {
-        console.log('IpSection entered viewport');
+        //console.log('IpSection entered viewport');
       },
       onLeave: () => {
-        console.log('IpSection left viewport - maintaining black background');
+        //console.log('IpSection left viewport - maintaining black background');
         // IpSection을 벗어나면 검은색으로 고정
         if (backgroundRef.current) {
           backgroundRef.current.style.backgroundColor = 'rgb(0, 0, 0)';
@@ -444,7 +444,7 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
 
     // CallToActionSection에서 흰색으로 전환
     const ctaElement = document.querySelector("[aria-labelledby='cta-heading']");
-    console.log('🎯 CTA element found:', !!ctaElement);
+    //console.log('🎯 CTA element found:', !!ctaElement);
     
     if (!ctaElement) {
       console.error('❌ CTA section not found!');
@@ -466,10 +466,10 @@ export const LandingDesktop = ({ shouldStartHeroVideo = false }: LandingDesktopP
         }
       },
       onEnter: () => {
-        console.log('CallToActionSection entered viewport');
+        //console.log('CallToActionSection entered viewport');
       },
       onLeave: () => {
-        console.log('CallToActionSection left viewport - maintaining white background');
+        //console.log('CallToActionSection left viewport - maintaining white background');
         // CallToActionSection을 벗어나면 흰색으로 고정
         if (backgroundRef.current) {
           backgroundRef.current.style.backgroundColor = 'rgb(255, 255, 255)';

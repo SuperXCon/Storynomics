@@ -18,13 +18,29 @@ export const App: React.FC = () => {
     });
   };
 
+  // HTML 로더에서 호출할 수 있도록 전역에 등록
+  React.useEffect(() => {
+    (window as any).handleHtmlLoadingComplete = handleLoadingComplete;
+
+    return () => {
+      delete (window as any).handleHtmlLoadingComplete;
+    };
+  }, []);
+
   return (
     <>
-      {/* 로딩 중에도 LandingDesktop을 백그라운드에서 렌더링 */}
-      <LandingDesktop shouldStartHeroVideo={shouldStartHeroVideo} />
-
-      {/* 로딩화면을 오버레이로 표시 */}
+      {/* 로딩화면을 최우선으로 표시 */}
       {isLoading && <PageLoader onLoadingComplete={handleLoadingComplete} />}
+
+      {/* LandingDesktop은 로딩 중에도 백그라운드에서 렌더링하지만 늦게 로드 */}
+      {!isLoading ? (
+        <LandingDesktop shouldStartHeroVideo={shouldStartHeroVideo} />
+      ) : (
+        // 로딩 중에는 숨겨진 상태로만 미리 로드
+        <div style={{ opacity: 0, position: 'absolute', pointerEvents: 'none', zIndex: -1 }}>
+          <LandingDesktop shouldStartHeroVideo={false} />
+        </div>
+      )}
     </>
   );
 };

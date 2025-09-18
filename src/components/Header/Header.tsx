@@ -47,9 +47,9 @@ export const Header = (): JSX.Element => {
         role="navigation"
         aria-label="Main navigation"
       >
-        <div className="inline-flex flex-col h-[60px] xl:h-[60px] items-start gap-2.5 relative flex-[0_0_auto]">
+        <div className="inline-flex flex-col h-[130px] xl:h-[130px] items-start gap-2.5 relative flex-[0_0_auto]">
           <img
-            className="h-[70%] xl:h-[100%] w-auto object-contain transition-all duration-200"
+            className="h-[70%] mt-[-10px] xl:h-[100%] w-auto object-contain transition-all duration-200"
             alt="Into The Wind Logo"
             src="/img/logo-header.svg"
           />
